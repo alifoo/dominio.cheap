@@ -1,36 +1,115 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# dominio.cheap
 
-## Getting Started
+Compare preços de registro, renovação e transferência de domínios em uma só
+tela, com valores convertidos para reais.
 
-First, run the development server:
+## O que o projeto faz
+
+- Consulta disponibilidade por RDAP e DNS.
+- Reúne cotações ao vivo e catálogos públicos de diferentes registradores.
+- Sugere extensões com menor preço-base enquanto o nome é digitado, removendo
+  domínios premium ou indisponíveis quando essa informação está disponível.
+- Converte preços em dólar e euro para real.
+- Mostra separadamente registro, renovação e transferência.
+- Continua funcionando sem credenciais, usando apenas as fontes públicas
+  disponíveis.
+
+## Rodando localmente
+
+Requisitos:
+
+- [Node.js](https://nodejs.org/) 22 ou mais recente
+- npm 10 ou mais recente
 
 ```bash
+git clone <url-do-seu-fork>
+cd dominio
+npm ci
+cp .env.example .env.local
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Acesse [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Variáveis de ambiente
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+`VERCEL_TOKEN` é opcional. Quando definido, permite consultar ao vivo os preços
+do Vercel Domains. Crie um token em
+[vercel.com/account/tokens](https://vercel.com/account/tokens) e mantenha-o
+somente no `.env.local`.
 
-## Learn More
+Nunca faça commit de tokens. Os arquivos `.env*` são ignorados, com exceção do
+`.env.example`, que contém apenas nomes de variáveis.
 
-To learn more about Next.js, take a look at the following resources:
+## Comandos
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run dev    # servidor de desenvolvimento
+npm run lint   # análise estática
+npm run build  # build de produção
+npm start      # executa o build de produção
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Usando com agents via MCP
 
-## Deploy on Vercel
+O app também funciona como um servidor
+[Model Context Protocol](https://modelcontextprotocol.io/) remoto usando
+Streamable HTTP. O endpoint local é:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```text
+http://localhost:3000/api/mcp
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Depois do deploy, troque a origem pela URL pública do projeto. Em clientes MCP
+que aceitam servidores remotos, a configuração segue este formato:
+
+```json
+{
+  "mcpServers": {
+    "dominio-cheap": {
+      "url": "https://seu-dominio.example/api/mcp"
+    }
+  }
+}
+```
+
+O servidor oferece a ferramenta `search_domain`, que recebe um domínio ou URL
+e devolve disponibilidade, preços de registro, renovação e transferência,
+links de compra e a cotação de câmbio usada. A resposta inclui texto para o
+modelo e dados estruturados para automações.
+
+## Rate limiting
+
+As rotas públicas têm limites por endereço IP e por instância:
+
+- busca completa: 20 requisições por minuto;
+- sugestões: 10 requisições por minuto;
+- câmbio e transporte MCP: 60 requisições por minuto.
+
+Respostas limitadas usam status `429`, `Retry-After` e os cabeçalhos
+`RateLimit-*`. O limitador em memória é uma proteção básica para instalações
+simples. Em produção distribuída, configure também rate limiting no proxy ou
+na plataforma de deploy.
+
+## Fontes de dados
+
+As integrações ficam em `lib/`. O projeto consulta RDAP, Google Public DNS,
+AwesomeAPI, Banco Central do Brasil e fontes públicas dos registradores. Os
+arquivos em `data/` são snapshots usados quando uma fonte não responde.
+
+Preços, promoções, câmbio e disponibilidade podem mudar sem aviso. O resultado
+é informativo: confirme as condições finais, impostos e taxas no registrador
+antes de comprar. Este projeto não é afiliado nem endossado pelas empresas
+citadas; marcas pertencem aos seus respectivos titulares.
+
+## Contribuindo
+
+Leia o [guia de contribuição](CONTRIBUTING.md) e o
+[Código de Conduta](CODE_OF_CONDUCT.md) antes de abrir uma pull request.
+Vulnerabilidades devem seguir a [política de segurança](SECURITY.md).
+
+Mantido por [alifoo](https://www.linkedin.com/in/alisson-ayres/).
+
+## Licença
+
+Distribuído sob a [licença MIT](LICENSE).

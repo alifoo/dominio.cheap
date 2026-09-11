@@ -1,0 +1,4 @@
+{
+  "io": { "first": 0.01, "renew": 89.99, "termYears": 3 },
+  "org": { "first": 9.99, "renew": 23.99, "termYears": 1 }
+}

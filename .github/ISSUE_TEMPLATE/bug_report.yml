@@ -1,0 +1,50 @@
+name: Relatar um bug
+description: Informe um comportamento reproduzível que precisa ser corrigido.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado pelo relato. Não inclua tokens, dados pessoais ou detalhes de vulnerabilidades.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Descrição
+      description: O que aconteceu e o que você esperava?
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Como reproduzir
+      description: Liste os menores passos possíveis.
+      placeholder: |
+        1. Pesquise por...
+        2. Clique em...
+        3. Observe...
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Ambiente
+      description: Navegador, sistema operacional e versão do Node.js, quando relevante.
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidências adicionais
+      description: Logs sem segredos, capturas de tela ou outros detalhes úteis.
+
+  - type: checkboxes
+    id: security
+    attributes:
+      label: Segurança
+      options:
+        - label: Confirmei que este relato não contém uma vulnerabilidade ou segredo.
+          required: true
