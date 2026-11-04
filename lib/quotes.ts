@@ -132,14 +132,18 @@ async function vercelQuote(domain: string): Promise<SourceQuote | null> {
       usd: null,
       live: true,
       buyUrl: `https://vercel.com/domains/search?q=${encodeURIComponent(domain)}`,
-      note: "defina VERCEL_TOKEN para cotar ao vivo",
+      note: "sem cotação ao vivo",
     };
   }
 
   const timeout = withTimeout(12000);
   try {
+    const params = new URLSearchParams({ years: "1" });
+    const teamId = process.env.VERCEL_ORG_ID;
+    if (teamId) params.set("teamId", teamId);
+
     const priceRes = await fetch(
-      `https://api.vercel.com/v1/registrar/domains/${encodeURIComponent(domain)}/price?years=1`,
+      `https://api.vercel.com/v1/registrar/domains/${encodeURIComponent(domain)}/price?${params}`,
       {
         headers: { Authorization: `Bearer ${token}` },
         signal: timeout.signal,
